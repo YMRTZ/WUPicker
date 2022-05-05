@@ -1,6 +1,7 @@
 <template>
   <q-layout view="lHh Lpr lFf">
-    <q-header elevated class="z-top">
+    <q-header elevated class="z-max">
+      <!--  class="z-top" -->
       <q-toolbar>
         <q-tabs>
           <q-route-tab name="home" label="Home" to="/" />

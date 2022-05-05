@@ -1,8 +1,10 @@
 <template>
   <q-page class="items-center justify-evenly">
-    <p>Upload Page</p>
-    <input ref="fileRef" type="file" />
-    <button @click="uploadImage()">Submit</button>
+    <q-layout>
+      <p>Upload Page</p>
+      <input ref="fileRef" type="file" />
+      <button @click="uploadImage()">Submit</button>
+    </q-layout>
   </q-page>
 </template>
 
@@ -24,9 +26,6 @@ const app: FirebaseApp = initializeApp(firebaseConfig);
 
 export default defineComponent({
   name: 'uploadComponent',
-  // setup() {
-  //   const fileRef: Ref = ref(null);
-  // },
   data() {
     return {
       fileRef: ref(null),
@@ -98,15 +97,6 @@ export default defineComponent({
           console.log('Something has gone very wrong!');
         }
       });
-
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      // if (fileRef) {
-      //   console.log(fileRef[0]);
-      //   // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      //   void uploadBytes(testRef, fileRef[0]).then((snapshot) => {
-      //     console.log('Uploaded');
-      //   });
-      // }
     },
     async addToFirebase(
       firebaseFileRef: DocumentReference,
