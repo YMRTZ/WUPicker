@@ -1,9 +1,11 @@
 <template>
   <q-page class="items-center justify-evenly">
-    <q-layout>
-      <p>Upload Page</p>
+    <q-layout class="q-ml-lg">
+      <h4>Upload Flag</h4>
+      <h6>Flags should be in format &lt;Country Code&gt;.png</h6>
       <input ref="fileRef" type="file" />
       <button @click="uploadImage()">Submit</button>
+      <button @click="clearInput()">Clear</button>
     </q-layout>
   </q-page>
 </template>
@@ -12,7 +14,6 @@
 import {
   doc,
   DocumentReference,
-  Firestore,
   getDoc,
   getFirestore,
   setDoc,
@@ -20,8 +21,9 @@ import {
 import { FirebaseApp, initializeApp } from 'firebase/app';
 import { getStorage, uploadBytes } from 'firebase/storage';
 import { ref as fireRef } from 'firebase/storage';
-import { defineComponent, Ref, ref } from 'vue';
+import { defineComponent, ref } from 'vue';
 import { firebaseConfig } from '../../firebase-config.js';
+
 const app: FirebaseApp = initializeApp(firebaseConfig);
 
 export default defineComponent({
@@ -34,13 +36,18 @@ export default defineComponent({
     };
   },
   methods: {
+    clearInput() {
+      let inputRef = this.$refs.fileRef as HTMLInputElement;
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+      inputRef.value = '';
+    },
     async uploadImage() {
       console.log('Upload start');
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       let htmlRef: HTMLInputElement = this.$refs.fileRef as HTMLInputElement;
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       let fileRef = htmlRef.files;
-      let testRef = fireRef(this.cloudstore_database, 'test.png');
+      // let testRef = fireRef(this.cloudstore_database, 'test.png');
 
       let fileNameExtension: string;
       let fileName = 'default';
@@ -87,6 +94,8 @@ export default defineComponent({
               if (fileRef) {
                 const uploadImage = uploadBytes(storageRef, fileRef[0]).then(
                   () => {
+                    alert('Upload success!');
+                    this.clearInput();
                     console.log('Uploaded');
                   }
                 );

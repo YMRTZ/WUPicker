@@ -1,6 +1,5 @@
 <template>
   <q-page>
-    <!-- justify-evenly -->
     <q-layout>
       <q-drawer :width="300" :breakpoint="500" bordered show-if-above>
         <q-scroll-area class="fit">
@@ -28,6 +27,7 @@
           :ratio="1"
           max-width:
           style="max-width: 300px"
+          class="q-mr-xs q-mb-xs"
         />
       </q-page-container>
       <!-- <q-footer>
