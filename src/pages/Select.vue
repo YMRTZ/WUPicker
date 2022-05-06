@@ -21,16 +21,18 @@
       </q-drawer>
       <q-page-container>
         <q-img
-          v-for="imageURL in images"
-          :key="imageURL"
-          :src="imageURL"
+          v-for="image in images"
+          :key="image.index"
+          :src="image.url"
           :ratio="1"
           max-width:
           style="max-width: 300px"
           class="q-mr-xs q-mb-xs"
+          @click="selectFlag(image.index)"
         />
       </q-page-container>
     </q-layout>
+    <q-footer><button @click="printImages()">Pain</button></q-footer>
   </q-page>
 </template>
 <script lang="ts">
@@ -46,15 +48,23 @@ export default defineComponent({
   data() {
     return {
       selected: '' as string,
+      selectedFlag: 0 as number,
       firestore_database: getFirestore(app),
       cloudstore_database: getStorage(),
       tags: [] as string[],
-      images: [] as string[],
+      images: [] as { index: number; url: string }[],
     };
   },
   methods: {
+    printImages() {
+      console.log('Images');
+      console.log(this.images);
+    },
     select(selectTag: string) {
       this.selected = selectTag;
+    },
+    selectFlag(selectedFlag: number) {
+      this.selectedFlag = selectedFlag;
     },
     testPrint() {
       console.log(this.selected);
@@ -96,8 +106,11 @@ export default defineComponent({
       for (let i = 1; i <= selectedCount; i++) {
         fileRef = fireRef(tagFolderRef, i.toString());
         void getDownloadURL(fileRef).then((gotFile) => {
+          let tempHold = { index: 0, url: '' };
           console.log(gotFile);
-          this.images.push(gotFile);
+          tempHold.url = gotFile;
+          tempHold.index = i;
+          this.images.push(tempHold);
         });
       }
     },
