@@ -30,29 +30,13 @@
           class="q-mr-xs q-mb-xs"
         />
       </q-page-container>
-      <!-- <q-footer>
-        <button @click="testPrint()">Test</button>
-        <button @click="getImages('QNG')">Test QNG</button>
-      </q-footer> -->
     </q-layout>
   </q-page>
 </template>
 <script lang="ts">
-import {
-  doc,
-  DocumentReference,
-  Firestore,
-  getDoc,
-  getFirestore,
-  setDoc,
-} from 'firebase/firestore';
+import { doc, getDoc, getFirestore } from 'firebase/firestore';
 import { FirebaseApp, initializeApp } from 'firebase/app';
-import {
-  getStorage,
-  listAll,
-  getBytes,
-  getDownloadURL,
-} from 'firebase/storage';
+import { getStorage, listAll, getDownloadURL } from 'firebase/storage';
 import { ref as fireRef } from 'firebase/storage';
 import { defineComponent } from 'vue';
 import { firebaseConfig } from '../../firebase-config.js';
@@ -78,7 +62,7 @@ export default defineComponent({
     print() {
       console.log('Printing');
       let testRef = fireRef(this.cloudstore_database);
-      const getTags = listAll(testRef).then((res) => {
+      void listAll(testRef).then(() => {
         // res.prefixes.forEach((tempTag) => {
         //   this.tags.push(tempTag.name);
         // });
@@ -89,7 +73,7 @@ export default defineComponent({
     },
     loadTags() {
       let loadRef = fireRef(this.cloudstore_database);
-      const getTags = listAll(loadRef).then((res) => {
+      void listAll(loadRef).then((res) => {
         res.prefixes.forEach((tempTag) => {
           this.tags.push(tempTag.name);
         });
@@ -103,15 +87,15 @@ export default defineComponent({
       let firebaseFileRef = doc(this.firestore_database, 'Tags', tag);
 
       let selectedCount = 0;
-      const getCount = await getDoc(firebaseFileRef).then((countSnap) => {
+      void (await getDoc(firebaseFileRef).then((countSnap) => {
         if (countSnap.exists()) {
           selectedCount = countSnap.data().count as number;
         }
-      });
+      }));
 
       for (let i = 1; i <= selectedCount; i++) {
         fileRef = fireRef(tagFolderRef, i.toString());
-        const getImg = getDownloadURL(fileRef).then((gotFile) => {
+        void getDownloadURL(fileRef).then((gotFile) => {
           console.log(gotFile);
           this.images.push(gotFile);
         });

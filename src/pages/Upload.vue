@@ -38,16 +38,12 @@ export default defineComponent({
   methods: {
     clearInput() {
       let inputRef = this.$refs.fileRef as HTMLInputElement;
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
       inputRef.value = '';
     },
     async uploadImage() {
       console.log('Upload start');
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       let htmlRef: HTMLInputElement = this.$refs.fileRef as HTMLInputElement;
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       let fileRef = htmlRef.files;
-      // let testRef = fireRef(this.cloudstore_database, 'test.png');
 
       let fileNameExtension: string;
       let fileName = 'default';
@@ -67,13 +63,12 @@ export default defineComponent({
         console.log(fileExtension);
       }
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
       const firebaseFileRef = doc(this.firestore_database, 'Tags', fileName);
       //Check if already added, add if not
       await getDoc(firebaseFileRef).then((snapshot) => {
         if (!snapshot.exists()) {
           console.log('DNE');
-          const addFile = this.addToFirebase(firebaseFileRef, 0).then(() => {
+          void this.addToFirebase(firebaseFileRef, 0).then(() => {
             console.log('Added');
           });
         }
@@ -83,25 +78,21 @@ export default defineComponent({
         if (snapshot.exists()) {
           let count: number = snapshot.data().count as number;
           count++;
-          const addFile = this.addToFirebase(firebaseFileRef, count).then(
-            () => {
-              console.log('Updated');
-              let storageRef = fireRef(
-                this.cloudstore_database,
-                fileName + '/' + count.toString()
-              );
-              console.log(storageRef);
-              if (fileRef) {
-                const uploadImage = uploadBytes(storageRef, fileRef[0]).then(
-                  () => {
-                    alert('Upload success!');
-                    this.clearInput();
-                    console.log('Uploaded');
-                  }
-                );
-              }
+          void this.addToFirebase(firebaseFileRef, count).then(() => {
+            console.log('Updated');
+            let storageRef = fireRef(
+              this.cloudstore_database,
+              fileName + '/' + count.toString()
+            );
+            console.log(storageRef);
+            if (fileRef) {
+              void uploadBytes(storageRef, fileRef[0]).then(() => {
+                alert('Upload success!');
+                this.clearInput();
+                console.log('Uploaded');
+              });
             }
-          );
+          });
         } else {
           console.log('Something has gone very wrong!');
         }
