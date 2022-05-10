@@ -25,10 +25,14 @@
           :key="image.index"
           :src="image.url"
           :ratio="1"
-          max-width:
           style="max-width: 300px"
-          class="q-mr-xs q-mb-xs flagDisplay"
           @click="selectFlag(image.index)"
+          :class="[
+            'q-mr-xs',
+            'q-mb-xs',
+            'flagDisplay',
+            { selectedOutline: selectedFlag === image.index },
+          ]"
         />
       </q-page-container>
     </q-layout>
@@ -64,7 +68,9 @@ export default defineComponent({
       this.selected = selectTag;
     },
     selectFlag(selectedFlag: number) {
+      console.log(selectedFlag);
       this.selectedFlag = selectedFlag;
+      console.log(this.selectedFlag);
     },
     testPrint() {
       console.log(this.selected);
@@ -120,3 +126,9 @@ export default defineComponent({
   },
 });
 </script>
+
+<style scoped lang="scss">
+.selectedOutline {
+  border: 4px solid blue;
+}
+</style>
