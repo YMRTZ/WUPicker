@@ -3,7 +3,7 @@
     <q-layout class="q-ml-lg">
       <h4>Upload Flag</h4>
       <h6>Flags should be in format &lt;Country Code&gt;.png</h6>
-      <input ref="fileRef" type="file" />
+      <input class="fileInputButton" ref="fileRef" type="file" />
       <button @click="uploadImage()">Submit</button>
       <button @click="clearInput()">Clear</button>
     </q-layout>

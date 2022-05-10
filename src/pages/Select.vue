@@ -27,7 +27,7 @@
           :ratio="1"
           max-width:
           style="max-width: 300px"
-          class="q-mr-xs q-mb-xs"
+          class="q-mr-xs q-mb-xs flagDisplay"
           @click="selectFlag(image.index)"
         />
       </q-page-container>
