@@ -3,10 +3,16 @@
     <q-layout class="q-ml-lg">
       <h4>Upload Flag</h4>
       <h6>Flags should be in format &lt;Country Code&gt;.png</h6>
-      <input class="fileInputButton" ref="fileRef" type="file" />
+      <input
+        class="fileInputButton"
+        ref="fileRef"
+        type="file"
+        accept="image/*"
+      />
       <button @click="uploadImage()">Submit</button>
       <button @click="clearInput()">Clear</button>
     </q-layout>
+    <q-footer><button @click="resizeImageTest()">Pain Upload</button></q-footer>
   </q-page>
 </template>
 
@@ -36,6 +42,36 @@ export default defineComponent({
     };
   },
   methods: {
+    resizeImageTest() {
+      void this.resizeImage().then((testImage) => {
+        console.log('start');
+        console.log(testImage);
+      });
+    },
+    resizeImage() {
+      let htmlRef: HTMLInputElement = this.$refs.fileRef as HTMLInputElement;
+      let fileRef = htmlRef.files;
+      var resizedImage;
+      return new Promise((resolve) => {
+        if (fileRef) {
+          var file = fileRef[0];
+          const fr = new FileReader();
+          fr.onload = function () {
+            var image = new Image();
+            image.src = fr.result as string;
+            image.onload = function () {
+              var canvas = document.createElement('canvas');
+              canvas.width = 140;
+              canvas.height = 140;
+              canvas.getContext('2d')?.drawImage(image, 0, 0, 140, 140);
+              resizedImage = canvas.toDataURL('image');
+              resolve(resizedImage);
+            };
+          };
+          fr.readAsDataURL(file);
+        }
+      });
+    },
     clearInput() {
       let inputRef = this.$refs.fileRef as HTMLInputElement;
       inputRef.value = '';
@@ -44,12 +80,17 @@ export default defineComponent({
       console.log('Upload start');
       let htmlRef: HTMLInputElement = this.$refs.fileRef as HTMLInputElement;
       let fileRef = htmlRef.files;
-
       let fileNameExtension: string;
       let fileName = 'default';
       let fileExtension: string;
-
       if (fileRef) {
+        // fr.readAsArrayBuffer(fileRef[0]);
+        // let pngBuffer = fr.result as ArrayBuffer;
+        // if (pngBuffer) {
+        //   pngPixelArray = new Uint8Array(pngBuffer);
+        // }
+
+        //Get filename, file extension, and full filename+extension
         fileNameExtension = fileRef[0].name;
         fileName = fileNameExtension.slice(
           0,
@@ -58,9 +99,6 @@ export default defineComponent({
         fileExtension = fileRef[0].name.slice(
           fileNameExtension.lastIndexOf('.')
         );
-        console.log(fileNameExtension);
-        console.log(fileName);
-        console.log(fileExtension);
       }
 
       const firebaseFileRef = doc(this.firestore_database, 'Tags', fileName);
@@ -73,18 +111,21 @@ export default defineComponent({
           });
         }
       });
-      //Update count
+      //Get Firestore data
       await getDoc(firebaseFileRef).then((snapshot) => {
         if (snapshot.exists()) {
+          //Import count from Firestore data
           let count: number = snapshot.data().count as number;
+          //Update count
           count++;
           void this.addToFirebase(firebaseFileRef, count).then(() => {
             console.log('Updated');
+            //Create storage reference for file
             let storageRef = fireRef(
               this.cloudstore_database,
               fileName + '/' + count.toString()
             );
-            console.log(storageRef);
+            //Upload file
             if (fileRef) {
               void uploadBytes(storageRef, fileRef[0]).then(() => {
                 alert('Upload success!');
