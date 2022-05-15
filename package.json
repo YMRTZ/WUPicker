@@ -11,7 +11,9 @@
     "test": "echo \"No test specified\" && exit 0"
   },
   "dependencies": {
+    "@gcto/firebase-hooks": "^2.0.0",
     "@quasar/extras": "^1.0.0",
+    "@vue/composition-api": "^1.6.1",
     "axios": "^0.21.1",
     "core-js": "^3.6.5",
     "cypress-image-diff-js": "^1.19.0",
@@ -19,7 +21,6 @@
     "firebase": "^9.7.0",
     "firebase-functions": "^3.20.1",
     "quasar": "^2.0.0",
-    "tga": "^1.0.5",
     "vue": "^3.0.0",
     "vue-router": "^4.0.0"
   },

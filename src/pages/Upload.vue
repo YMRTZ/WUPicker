@@ -25,7 +25,7 @@ import {
   setDoc,
 } from 'firebase/firestore';
 import { FirebaseApp, initializeApp } from 'firebase/app';
-import { getStorage, uploadBytes } from 'firebase/storage';
+import { getStorage, uploadBytes, updateMetadata } from 'firebase/storage';
 import { ref as fireRef } from 'firebase/storage';
 import { defineComponent, ref } from 'vue';
 import { firebaseConfig } from '../../firebase-config.js';
@@ -44,8 +44,8 @@ export default defineComponent({
   methods: {
     resizeImageTest() {
       void this.resizeImage().then((testImage) => {
-        console.log('start');
-        console.log(testImage);
+        // console.log('start');
+        // console.log(testImage);
       });
     },
     resizeImage() {
@@ -77,12 +77,12 @@ export default defineComponent({
       inputRef.value = '';
     },
     async uploadImage() {
-      console.log('Upload start');
+      // console.log('Upload start');
       let htmlRef: HTMLInputElement = this.$refs.fileRef as HTMLInputElement;
       let fileRef = htmlRef.files;
       let fileNameExtension: string;
       let fileName = 'default';
-      let fileExtension: string;
+      // let fileExtension: string;
       if (fileRef) {
         // fr.readAsArrayBuffer(fileRef[0]);
         // let pngBuffer = fr.result as ArrayBuffer;
@@ -96,18 +96,18 @@ export default defineComponent({
           0,
           fileNameExtension.lastIndexOf('.')
         );
-        fileExtension = fileRef[0].name.slice(
-          fileNameExtension.lastIndexOf('.')
-        );
+        // fileExtension = fileRef[0].name.slice(
+        //   fileNameExtension.lastIndexOf('.')
+        // );
       }
 
       const firebaseFileRef = doc(this.firestore_database, 'Tags', fileName);
       //Check if already added, add if not
       await getDoc(firebaseFileRef).then((snapshot) => {
         if (!snapshot.exists()) {
-          console.log('DNE');
+          // console.log('DNE');
           void this.addToFirebase(firebaseFileRef, 0).then(() => {
-            console.log('Added');
+            // console.log('Added');
           });
         }
       });
@@ -119,23 +119,47 @@ export default defineComponent({
           //Update count
           count++;
           void this.addToFirebase(firebaseFileRef, count).then(() => {
-            console.log('Updated');
+            // console.log('Updated');
             //Create storage reference for file
             let storageRef = fireRef(
               this.cloudstore_database,
               fileName + '/' + count.toString()
             );
-            //Upload file
+            let storageRefResized = fireRef(
+              this.cloudstore_database,
+              fileName + '/' + 'tga' + '/' + count.toString() + '.tga'
+            );
+            //Upload files
             if (fileRef) {
               void uploadBytes(storageRef, fileRef[0]).then(() => {
-                alert('Upload success!');
-                this.clearInput();
-                console.log('Uploaded');
+                // console.log('Uploaded');
+              });
+              void this.resizeImage().then((resizedImage) => {
+                let resizedType = resizedImage as string;
+                // console.log(resizedType.replace('data:image/png;base64,', ''));
+                let byteCharacters = atob(
+                  resizedType.replace('data:image/png;base64,', '')
+                );
+                let byteNumbers = new Array(byteCharacters.length);
+                for (let i = 0; i < byteCharacters.length; i++) {
+                  byteNumbers[i] = byteCharacters.charCodeAt(i);
+                }
+                let byteArray = new Uint8Array(byteNumbers);
+                void uploadBytes(storageRefResized, byteArray).then(() => {
+                  var metaData = {
+                    contentDisposition: 'filename = "' + fileName + '.tga"',
+                  };
+                  // console.log(metaData);
+                  void updateMetadata(storageRefResized, metaData);
+                  alert('Upload success!');
+                  this.clearInput();
+                  // console.log('Uploaded resized');
+                });
               });
             }
           });
         } else {
-          console.log('Something has gone very wrong!');
+          // console.log('Something has gone very wrong!');
         }
       });
     },
